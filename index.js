@@ -1,21 +1,25 @@
 var TENSION = 800;
 var FRICTION = 90;
 
-import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  Text,
-  Image,
-  View,
-  Animated,
   AlertIOS,
+  Animated,
+  AppRegistry,
+  Dimensions,
+  Easing,
+  Image,
   PanResponder,
-  Dimensions, TouchableOpacity
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from 'react-native';
+import React, { Component } from 'react';
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 export default class component extends Component {
+  position = null;
+  
   constructor(props) {
     super(props)
     // naming it initialX clearly indicates that the only purpose
@@ -47,17 +51,23 @@ export default class component extends Component {
     var isGoingToUp = (velocityY < 0) ? true : false;
     var speed = Math.abs(velocityY);
     var currentPosition = Math.abs(positionY / SCREEN_HEIGHT);
-    var endPosition = isGoingToUp ? finalPosition + 50 : initialPositon + 50;
+    var endPosition = isGoingToUp ? finalPosition : initialPositon;
 
-    var position = new Animated.Value(positionY);
-    position.removeAllListeners();
+    if (this.position) {
+      this.position.removeAllListeners();
+    }
+    
+    var position = this.position = new Animated.Value(positionY);
 
+    // alert(endPosition);
+    
     // console.log('configuration : '+endPosition)
-    Animated.timing(position, {
+    Animated.spring(position, {
       toValue: endPosition,
-      tension: 30,
-      friction: 0,
-      // easing:Easing.elastic,
+      // tension: 30,
+      // friction: 0,
+      // easing: Easing.out(Easing.ease),
+      bounciness: 0,
       velocity: velocityY
     }).start();
 
@@ -70,7 +80,7 @@ export default class component extends Component {
 
   onUpdatePosition(position) {
     // console.log('UPDATE_POSITION', position);
-    position = position - 50;
+    position = position;
     this.state.position.setValue(position);
     this._previousTop = position;
     // console.log('Position ', position);
