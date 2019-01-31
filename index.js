@@ -67,7 +67,7 @@ export default class component extends Component {
       // tension: 30,
       // friction: 0,
       // easing: Easing.out(Easing.ease),
-      bounciness: 0,
+      bounciness: isGoingToUp ? 8 : 0,
       velocity: velocityY
     }).start();
 
