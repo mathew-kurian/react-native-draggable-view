@@ -135,11 +135,7 @@ export default class component extends Component {
 
    
     return (
-      <View style={styles.viewport}>
-        <View style={styles.container}>
-          {containerView}
-        </View>
-      { !this.props.disableDrawer && <Animated.View
+      <Animated.View
           style={[drawerPosition, styles.drawer,
             { backgroundColor: this.props.drawerBg ? this.props.drawerBg : 'white' }]}
           ref={(center) => this.center = center}
@@ -155,9 +151,7 @@ export default class component extends Component {
             {initDrawerView}
           </TouchableWithoutFeedback>
           {drawerView}
-        </Animated.View> }
-
-      </View >
+        </Animated.View>
     );
   }
 };
