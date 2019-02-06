@@ -127,12 +127,18 @@ export default class component extends Component {
 
   render() {
     var containerView = this.props.renderContainerView ? this.props.renderContainerView() : null;
+    
+    if (this.props.disableDrawer) {
+      return containerView;
+    }
+    
     var drawerView = this.props.renderDrawerView ? this.props.renderDrawerView() : null;
     var initDrawerView = this.props.renderInitDrawerView ? this.props.renderInitDrawerView() : null;
     var drawerPosition = {
       top: this.state.position
     };
 
+   
     return (
       <View style={styles.viewport}>
         <View style={styles.container}>
