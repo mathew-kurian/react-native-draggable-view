@@ -127,11 +127,6 @@ export default class component extends Component {
 
   render() {
     var containerView = this.props.renderContainerView ? this.props.renderContainerView() : null;
-    
-    if (this.props.disableDrawer) {
-      return containerView;
-    }
-    
     var drawerView = this.props.renderDrawerView ? this.props.renderDrawerView() : null;
     var initDrawerView = this.props.renderInitDrawerView ? this.props.renderInitDrawerView() : null;
     var drawerPosition = {
@@ -144,7 +139,7 @@ export default class component extends Component {
         <View style={styles.container}>
           {containerView}
         </View>
-        <Animated.View
+      { !this.props.disableDrawer && <Animated.View
           style={[drawerPosition, styles.drawer,
             { backgroundColor: this.props.drawerBg ? this.props.drawerBg : 'white' }]}
           ref={(center) => this.center = center}
@@ -152,17 +147,15 @@ export default class component extends Component {
         >
           <TouchableWithoutFeedback
             onPressIn={() => {
-              console.log('touch in');
               this.setState({ touched: 'TRUE' });
             }}
             onPressOut={() => {
               this.setState({ touched: 'FALSE' });
-              console.log('touch out');
             }}>
             {initDrawerView}
           </TouchableWithoutFeedback>
           {drawerView}
-        </Animated.View>
+        </Animated.View> }
 
       </View >
     );
