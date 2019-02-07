@@ -1,18 +1,4 @@
-import {
-  AlertIOS,
-  Animated,
-  AppRegistry,
-  Dimensions,
-  Easing,
-  Image,
-  PanResponder,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
-} from "react-native";
-
+import { Animated, Dimensions, PanResponder, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import React, { Component } from "react";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -80,16 +66,10 @@ export default class component extends Component {
   onUpdatePosition(position) {
     this.state.position.setValue(position);
 
-    const { initialPosition, finalPosition } = this.state;
-
-    if (initialPosition === position) {
-      if (this.props.onInitialPositionReached) {
-        this.props.onInitialPositionReached();
-      }
-    }
+    const { finalPosition, initialUsedSpace, initialPositon } = this.state;
 
     if (this.props.onUpdatePosition) {
-      this.props.onUpdatePosition(position, initialPosition, finalPosition);
+      this.props.onUpdatePosition(position, finalPosition, initialPositon, initialUsedSpace);
     }
   }
 
@@ -145,9 +125,11 @@ export default class component extends Component {
     var drawerView = this.props.renderDrawerView
       ? this.props.renderDrawerView()
       : null;
-    var initDrawerView = this.props.renderInitDrawerView
+    
+      var initDrawerView = this.props.renderInitDrawerView
       ? this.props.renderInitDrawerView()
       : null;
+
     var drawerPosition = {
       top: this.state.position
     };
@@ -156,10 +138,7 @@ export default class component extends Component {
       <Animated.View
         style={[
           drawerPosition,
-          styles.drawer,
-          {
-            backgroundColor: this.props.drawerBg ? this.props.drawerBg : "white"
-          }
+          styles.drawer
         ]}
         ref={center => (this.center = center)}
         {...this._panGesture.panHandlers}
