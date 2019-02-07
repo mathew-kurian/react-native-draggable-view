@@ -28,7 +28,7 @@ export default class component extends Component {
     var finalDrawerSize = this.props.finalDrawerHeight ? this.props.finalDrawerHeight : 0;
 
     this.state = {
-      touched: 'FALSE',
+      touched: false,
       initialPositon: initialDrawerSize,
       finalPosition: finalDrawerSize,
       initialUsedSpace: initialUsedSpace,
@@ -85,7 +85,7 @@ export default class component extends Component {
   componentWillMount() {
     this._panGesture = PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return this.isAValidMovement(gestureState.dx, gestureState.dy) && this.state.touched == 'TRUE';
+        return this.isAValidMovement(gestureState.dx, gestureState.dy) && this.state.touched === true;
       },
       onPanResponderMove: (evt, gestureState) => {
         this.moveDrawerView(gestureState);
@@ -135,10 +135,10 @@ export default class component extends Component {
         >
           <TouchableWithoutFeedback
             onPressIn={() => {
-              this.setState({ touched: 'TRUE' });
+              this.setState({ touched: true });
             }}
             onPressOut={() => {
-              this.setState({ touched: 'FALSE' });
+              this.setState({ touched: false });
             }}>
             {initDrawerView}
           </TouchableWithoutFeedback>
