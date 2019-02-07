@@ -29,6 +29,7 @@ export default class component extends Component {
 
     this.state = {
       touched: false,
+      position: new Animated.Value(initialDrawerSize),
       initialPositon: initialDrawerSize,
       finalPosition: finalDrawerSize,
       initialUsedSpace: initialUsedSpace,
@@ -125,10 +126,13 @@ export default class component extends Component {
   render() {
     var drawerView = this.props.renderDrawerView ? this.props.renderDrawerView() : null;
     var initDrawerView = this.props.renderInitDrawerView ? this.props.renderInitDrawerView() : null;
-   
+   var drawerPosition = {
+      top: this.state.position
+    };
+
     return (
       <Animated.View
-          style={[styles.drawer,
+          style={[drawerPosition, styles.drawer,
             { backgroundColor: this.props.drawerBg ? this.props.drawerBg : 'white' }]}
           ref={(center) => this.center = center}
           {...this._panGesture.panHandlers}
