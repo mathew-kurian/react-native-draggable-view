@@ -14,7 +14,8 @@ export default class component extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.initialDrawerSize != this.props.initialDrawerSize) {
-        this.setState(this.computeState(nextProps));
+      const nextState = this.computeState(nextProps);
+      this.setState(nextState, nextState.callback);
     }
   }
 
@@ -22,16 +23,23 @@ export default class component extends Component {
     const initialUsedSpace = Math.abs(props.initialDrawerSize);
     const initialDrawerSize = SCREEN_HEIGHT * (1 - initialUsedSpace);
 
-    var finalDrawerSize = this.props.finalDrawerHeight
-      ? this.props.finalDrawerHeight
+    const finalDrawerSize = props.finalDrawerHeight
+      ? props.finalDrawerHeight
       : 0;
+
+    const prevHeight = this.props.finalDrawerHeight;
 
     return {
       touched: false,
       position: new Animated.Value(initialDrawerSize),
       initialPositon: initialDrawerSize,
       finalPosition: finalDrawerSize,
-      initialUsedSpace: initialUsedSpace
+      initialUsedSpace: initialUsedSpace,
+      callback: () => {
+        if (finalDrawerSize === SCREEN_HEIGHT && prevHeight < SCREEN_HEIGHT) {
+          this.startAnimation(0, prevHeight, initialDrawerSize, 'restore-drawer', SCREEN_HEIGHT);
+        }
+      }
     };
   }
 
@@ -136,8 +144,8 @@ export default class component extends Component {
     var drawerView = this.props.renderDrawerView
       ? this.props.renderDrawerView()
       : null;
-    
-      var initDrawerView = this.props.renderInitDrawerView
+
+    var initDrawerView = this.props.renderInitDrawerView
       ? this.props.renderInitDrawerView()
       : null;
 
