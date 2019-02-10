@@ -8,16 +8,25 @@ export default class component extends Component {
 
   constructor(props) {
     super(props);
-    // naming it initialX clearly indicates that the only purpose
-    // of the passed down prop is to initialize something internally
-    const initialUsedSpace = Math.abs(this.props.initialDrawerSize);
+
+    this.state = this.computeState(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.initialDrawerSize != this.props.initialDrawerSize) {
+        this.setState(this.computeState(nextProps));
+    }
+  }
+
+  computeState(props) {
+    const initialUsedSpace = Math.abs(props.initialDrawerSize);
     const initialDrawerSize = SCREEN_HEIGHT * (1 - initialUsedSpace);
 
     var finalDrawerSize = this.props.finalDrawerHeight
       ? this.props.finalDrawerHeight
       : 0;
 
-    this.state = {
+    return {
       touched: false,
       position: new Animated.Value(initialDrawerSize),
       initialPositon: initialDrawerSize,
@@ -54,7 +63,9 @@ export default class component extends Component {
     Animated.spring(position, {
       toValue: endPosition,
       bounciness: isGoingToUp ? 8 : 0,
-      velocity: velocityY
+      // overshootClamping: true,
+      velocity: velocityY,
+      useNativeDriver: true
     }).start();
 
     position.addListener(position => {
