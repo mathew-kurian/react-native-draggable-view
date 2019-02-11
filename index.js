@@ -57,7 +57,6 @@ export default class component extends Component {
   ) => {
     // alert(JSON.stringify({velocityY, positionY, initialPositon, finalPosition}));
     this.state.position.stopAnimation();
-    this.state.position.removeAllListeners();
 
     Animated.spring(this.state.position, {
       toValue: endPosition,
@@ -66,6 +65,8 @@ export default class component extends Component {
       velocity: velocityY,
       useNativeDriver: true
     }).start();
+
+    this.state.position.removeAllListeners();
 
     this.state.position.addListener(position => {
       if (!this.center) return;
@@ -102,7 +103,7 @@ export default class component extends Component {
     if (!this.center) return;
 
     // Here, I'm subtracting %5 of screen size from edge drawer position to be closer as possible to finger location when dragging the drawer view
-    var position = gestureState.moveY - SCREEN_HEIGHT * 0.05;
+    var position = gestureState.moveY - SCREEN_HEIGHT * 0.035;
     
     this.state.position.setValue(position);
 
