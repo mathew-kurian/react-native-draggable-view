@@ -4,7 +4,8 @@ import React, { Component } from "react";
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 export default class component extends Component {
-  position = null;
+  state = {};
+  center = null;
 
   constructor(props) {
     super(props);
@@ -12,10 +13,17 @@ export default class component extends Component {
     this.state = this.computeState(this.props);
   }
 
+  componentWillUnmount() {
+    this.state.position.removeAllListeners();
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (nextProps.initialDrawerSize != this.props.initialDrawerSize) {
-      const nextState = this.computeState(nextProps);
-      this.setState(nextState, nextState.callback);
+    if (!!nextProps.visible !== !!this.props.visible) {
+      if (nextProps.visible) {
+        this.startAnimation(-2.85, this.state.initialPositon);
+      } else {
+        this.startAnimation(2.85, SCREEN_HEIGHT);
+      }
     }
   }
 
@@ -27,19 +35,12 @@ export default class component extends Component {
       ? props.finalDrawerHeight
       : 0;
 
-    const prevHeight = this.props.finalDrawerHeight;
-
     return {
       touched: false,
-      position: new Animated.Value(initialDrawerSize),
+      position: new Animated.Value(props.visible ? initialDrawerSize : SCREEN_HEIGHT),
       initialPositon: initialDrawerSize,
       finalPosition: finalDrawerSize,
-      initialUsedSpace: initialUsedSpace,
-      callback: () => {
-        if (finalDrawerSize === SCREEN_HEIGHT && prevHeight < SCREEN_HEIGHT) {
-          this.startAnimation(0, prevHeight, initialDrawerSize, 'restore-drawer', SCREEN_HEIGHT);
-        }
-      }
+      initialUsedSpace: initialUsedSpace
     };
   }
 
@@ -52,39 +53,27 @@ export default class component extends Component {
 
   startAnimation = (
     velocityY,
-    positionY,
-    initialPositon,
-    id,
-    finalPosition
+    endPosition
   ) => {
-    var isGoingToUp = velocityY < 0 ? true : false;
-    var speed = Math.abs(velocityY);
-    var currentPosition = Math.abs(positionY / SCREEN_HEIGHT);
-    var endPosition = isGoingToUp ? finalPosition : initialPositon;
+    // alert(JSON.stringify({velocityY, positionY, initialPositon, finalPosition}));
+    this.state.position.stopAnimation();
+    this.state.position.removeAllListeners();
 
-    if (this.position) {
-      this.position.removeAllListeners();
-    }
-
-    var position = (this.position = new Animated.Value(positionY));
-
-    Animated.spring(position, {
+    Animated.spring(this.state.position, {
       toValue: endPosition,
-      bounciness: isGoingToUp ? 8 : 0,
-      // overshootClamping: true,
+      bounciness: 0,
+      speed: 12,
       velocity: velocityY,
       useNativeDriver: true
     }).start();
 
-    position.addListener(position => {
+    this.state.position.addListener(position => {
       if (!this.center) return;
       this.onUpdatePosition(position.value);
     });
   };
 
   onUpdatePosition(position) {
-    this.state.position.setValue(position);
-
     const { finalPosition, initialUsedSpace, initialPositon } = this.state;
 
     if (this.props.onUpdatePosition) {
@@ -112,11 +101,10 @@ export default class component extends Component {
   moveDrawerView(gestureState) {
     if (!this.center) return;
 
-    var currentValue = Math.abs(gestureState.moveY / SCREEN_HEIGHT);
-    var isGoingToUp = gestureState.vy < 0;
-
     // Here, I'm subtracting %5 of screen size from edge drawer position to be closer as possible to finger location when dragging the drawer view
     var position = gestureState.moveY - SCREEN_HEIGHT * 0.05;
+    
+    this.state.position.setValue(position);
 
     // Send to callback function the current drawer position when drag down the drawer view component
     this.onUpdatePosition(position);
@@ -129,10 +117,7 @@ export default class component extends Component {
 
     this.startAnimation(
       gestureState.vy,
-      gestureState.moveY,
-      this.state.initialPositon,
-      gestureState.stateId,
-      this.state.finalPosition
+      gestureState.vy > 0 ? this.state.initialPositon : this.state.finalPosition
     );
 
     if (this.props.onRelease) {
@@ -150,7 +135,7 @@ export default class component extends Component {
       : null;
 
     var drawerPosition = {
-      top: this.state.position
+      transform: [{translateY: this.state.position }]
     };
 
     return (
