@@ -136,6 +136,8 @@ export default class component extends Component {
   }
 
   componentWillUnmount() {
+    this.shouldRenderDrawerContent = false;
+
     cancelAnimationFrame(this.aid);
   }
 
