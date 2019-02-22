@@ -1,12 +1,13 @@
 import { Animated, Dimensions, PanResponder, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import React, { Component } from "react";
-import shouldComponentUpdate from 'react-native-calendars/src/calendar/updater';
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 export default class component extends Component {
   state = {};
   center = null;
+
+  shouldRenderDrawerContent = false;
 
   constructor(props) {
     super(props);
@@ -122,14 +123,30 @@ export default class component extends Component {
     }
   }
 
+  aid = null;
+
+  componentDidMount() {
+    this.aid = requestAnimationFrame(() => {
+      if (!this.shouldRenderDrawerContent) {
+        this.shouldRenderDrawerContent = true
+
+        this.forceUpdate();
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.aid);
+  }
+
   render() {
     var drawerView = this.props.renderDrawerView
-      ? this.props.renderDrawerView()
-      : this.props.drawerView;
+      ? this.props.renderDrawerView({ shouldRenderContent: this.shouldRenderDrawerContent })
+      : null;
 
     var initDrawerView = this.props.renderInitDrawerView
       ? this.props.renderInitDrawerView()
-      : this.props.initDrawerView;
+      : null;
 
     var drawerPosition = {
       transform: [{translateY: this.state.position }]
@@ -146,6 +163,7 @@ export default class component extends Component {
       >
         <TouchableWithoutFeedback
           onPressIn={() => {
+            this.shouldRenderDrawerContent = true;
             this.setState({ touched: true });
           }}
           onPressOut={() => {
