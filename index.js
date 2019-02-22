@@ -1,5 +1,6 @@
 import { Animated, Dimensions, PanResponder, StyleSheet, TouchableWithoutFeedback } from "react-native";
 import React, { Component } from "react";
+import shouldComponentUpdate from 'react-native-calendars/src/calendar/updater';
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -84,12 +85,7 @@ export default class component extends Component {
 
   componentWillMount() {
     this._panGesture = PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return (
-          this.isAValidMovement(gestureState.dx, gestureState.dy) &&
-          this.state.touched === true
-        );
-      },
+      onMoveShouldSetPanResponder: (evt, gestureState) => this.state.touched === true,
       onPanResponderMove: (evt, gestureState) => {
         this.moveDrawerView(gestureState);
       },
@@ -104,7 +100,7 @@ export default class component extends Component {
 
     // Here, I'm subtracting %5 of screen size from edge drawer position to be closer as possible to finger location when dragging the drawer view
     var position = gestureState.moveY - SCREEN_HEIGHT * 0.035;
-    
+
     this.state.position.setValue(position);
 
     // Send to callback function the current drawer position when drag down the drawer view component
@@ -129,11 +125,11 @@ export default class component extends Component {
   render() {
     var drawerView = this.props.renderDrawerView
       ? this.props.renderDrawerView()
-      : null;
+      : this.props.drawerView;
 
     var initDrawerView = this.props.renderInitDrawerView
       ? this.props.renderInitDrawerView()
-      : null;
+      : this.props.initDrawerView;
 
     var drawerPosition = {
       transform: [{translateY: this.state.position }]
