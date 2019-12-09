@@ -22,7 +22,7 @@ export default class component extends Component {
   componentWillReceiveProps(nextProps) {
     if (!!nextProps.visible !== !!this.props.visible) {
       if (nextProps.visible) {
-        this.startAnimation(-2.85, this.state.initialPositon);
+        this.startAnimation(-2.85, this.state.finalPosition);
       } else {
         this.startAnimation(2.85, SCREEN_HEIGHT);
       }
